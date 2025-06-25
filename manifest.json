@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "네이버 증권 재무 리포트 생성기",
+  "version": "1.0.0",
+  "description": "네이버 증권에서 주식 종목 분석 및 재무 리포트를 자동 생성하는 크롬 익스텐션",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.naver.com/*",
+    "https://api.stock.naver.com/*",
+    "https://polling.finance.naver.com/*",
+    "https://m.stock.naver.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"],
+      "css": ["styles/floating-button.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_title": "네이버 증권 재무 리포트 생성기",
+    "default_popup": "src/popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["styles/*", "assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  }
+}
