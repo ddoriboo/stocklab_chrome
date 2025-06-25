@@ -1,117 +1,75 @@
-# 네이버 증권 재무 리포트 생성기
+# StockLab Chrome - 주식 분석 크롬 익스텐션
 
-네이버 증권에서 특정 종목을 검색할 때 ChatGPT AI가 분석한 전문적인 재무 리포트를 자동 생성하는 크롬 익스텐션입니다.
+웹페이지에서 주식 키워드를 자동으로 감지하고 MCP 서버와 OpenAI API를 활용해 실시간 분석을 제공하는 크롬 익스텐션입니다.
 
 ## ✨ 주요 기능
 
-- 🎯 **플로팅 버튼**: 브라우저 중앙 하단에 반투명 플로팅 버튼 표시
-- 🔍 **스마트 키워드 추출**: 현재 페이지에서 주식 관련 키워드 자동 인식
-- 📊 **실시간 데이터 수집**: 네이버 금융 API를 통한 실시간 주가, 차트, 뉴스 데이터
-- 🤖 **AI 분석**: ChatGPT를 활용한 전문적인 주식 분석 및 투자 의견
-- 📈 **종합 리포트**: 주가 동향, 투자자 동향, 뉴스 영향, 종합 투자 의견 제공
+- 🔍 **자동 키워드 감지**: 웹페이지에서 주식 종목명/코드 자동 인식
+- 📊 **실시간 주식 데이터**: KOSPI/KOSDAQ 주식 정보 조회
+- 🤖 **AI 분석**: OpenAI를 통한 투자 인사이트 생성
+- ☁️ **Railway 배포**: 서버를 클라우드에서 24/7 운영
 
-## 🚀 설치 및 설정
+## 🚀 빠른 시작
 
-### 1. 익스텐션 설치
-1. 크롬 브라우저에서 `chrome://extensions/` 접속
-2. 우상단의 "개발자 모드" 활성화
+### 1. Railway 배포
+1. [Railway](https://railway.app)에서 이 저장소 연결
+2. 자동 배포 완료 후 URL 확인
+
+### 2. 크롬 익스텐션 설치
+1. `chrome://extensions/` 접속
+2. "개발자 모드" 활성화
 3. "압축해제된 확장 프로그램을 로드합니다" 클릭
-4. 이 프로젝트 폴더 선택
+4. `stock-analyzer-extension` 폴더 선택
 
-### 2. OpenAI API 키 설정 (필수)
-1. [OpenAI API 키 생성](https://platform.openai.com/api-keys)에서 API 키 발급
-2. 익스텐션 설치 후 브라우저 상단의 익스텐션 아이콘 클릭
-3. API 키 입력 후 저장
-
-### 3. 아이콘 설정 (선택)
-아이콘 파일이 없어도 작동하지만, 더 나은 사용자 경험을 위해 다음 아이콘들을 추가하세요:
-- `assets/icon16.png` (16x16px)
-- `assets/icon48.png` (48x48px)  
-- `assets/icon128.png` (128x128px)
-
-**아이콘 생성 방법:**
-- [Favicon.io](https://favicon.io/favicon-generator/)에서 💹 또는 📊 이모지로 생성
-- 생성된 파일을 `assets/` 폴더에 저장
+### 3. 설정
+1. 익스텐션 아이콘 클릭
+2. Railway 서버 URL 입력
+3. OpenAI API 키 입력
+4. 저장
 
 ## 📱 사용법
 
-1. **네이버 관련 사이트 접속** (finance.naver.com 등)
-2. **주식 종목 페이지로 이동** 또는 종목명/코드가 포함된 페이지
-3. **플로팅 버튼 클릭** (화면 하단 중앙의 파란색 원형 버튼)
-4. **AI 분석 결과 확인** (자동으로 데이터 수집 및 분석 진행)
+웹페이지에서 주식 키워드(삼성전자, SK하이닉스 등)가 자동으로 하이라이트됩니다. 
+하이라이트된 키워드를 클릭하면 해당 종목의 실시간 데이터와 AI 분석을 볼 수 있습니다.
 
-### 지원하는 종목
-- 삼성전자 (005930)
-- SK하이닉스 (000660)
-- 네이버 (035420)
-- 카카오 (035720)
-- LG화학 (051910)
-- 삼성SDI (006400)
-- 현대차 (005380)
-- 기아 (000270)
-- POSCO (005490)
-- 셀트리온 (068270)
+## 🛠️ 기술 스택
 
-*추가 종목은 코드에서 `getStockCodeByName` 함수를 수정하여 확장 가능*
+- **Frontend**: Chrome Extension (Manifest V3)
+- **Backend**: Node.js + Express
+- **Data Source**: pykrx (한국 주식 데이터)
+- **AI**: OpenAI GPT-3.5
+- **Deployment**: Railway
 
-## 🔧 기술 구조
+## 📂 프로젝트 구조
 
-### 워크플로우
 ```
-페이지 키워드 추출 → 네이버 API 데이터 수집 → ChatGPT AI 분석 → 리포트 생성
+├── stock-analyzer-extension/  # 크롬 익스텐션
+│   ├── manifest.json
+│   ├── content.js           # 키워드 감지
+│   ├── background.js        # API 통신
+│   └── popup.html/js        # 설정 UI
+├── server.js                # 백엔드 서버
+├── package.json
+└── railway.json             # Railway 배포 설정
 ```
 
-### 데이터 소스
-- **기본 정보**: `https://m.stock.naver.com/front-api/v1/stock/basic/[code]`
-- **차트 데이터**: `https://m.stock.naver.com/front-api/v1/stock/chart/[code]`
-- **뉴스 정보**: `https://m.stock.naver.com/front-api/v1/news/stock/[code]`
-- **투자자 동향**: `https://m.stock.naver.com/front-api/v1/stock/investor/[code]`
+## 🔧 로컬 개발
 
-### 프로젝트 구조
+```bash
+# 서버 실행
+npm install
+npm run dev
+
+# 익스텐션 로드
+# chrome://extensions에서 stock-analyzer-extension 폴더 로드
 ```
-├── manifest.json              # 익스텐션 설정
-├── src/
-│   ├── content.js            # 메인 분석 로직
-│   ├── background.js         # API 호출 및 AI 분석
-│   ├── popup.html           # 설정 팝업 UI
-│   └── popup.js             # 설정 팝업 로직
-├── styles/
-│   └── floating-button.css   # UI 스타일
-└── assets/                   # 아이콘 파일들
-```
-
-## 🛠️ 개발자 정보
-
-### 주요 기능
-- **CORS 우회**: Background Script를 통한 안전한 API 호출
-- **에러 처리**: 네트워크 오류, API 키 누락 등 다양한 상황 대응
-- **반응형 UI**: 모든 화면 크기에서 최적화된 사용자 인터페이스
-- **실시간 분석**: 페이지 로드 시 자동 키워드 감지 및 분석
-
-### API 사용량
-- **OpenAI API**: GPT-3.5-turbo 모델 사용 (분석당 약 2000 토큰)
-- **네이버 API**: 무료 공개 API 사용
 
 ## ⚠️ 주의사항
 
-- OpenAI API 키가 필요합니다 (유료 서비스)
-- 네이버 API 사용량 제한이 있을 수 있습니다
-- 투자 정보는 참고용이며, 실제 투자 결정은 신중히 하세요
-- 네이버 이용약관을 준수하여 사용하세요
+- OpenAI API 키가 필요합니다 (유료)
+- Railway 무료 플랜은 월 $5 크레딧 제공
+- 투자 결정은 신중히 하세요
 
-## 🔄 업데이트 로그
+## 📄 라이선스
 
-### v2.0.0 (Latest)
-- 🎨 **완전히 새로운 애플 감성 UI**: 작고 깔끔한 디자인으로 전면 개편
-- 🚀 **GPT-4o Mini** 모델로 업그레이드하여 더 정확하고 빠른 분석
-- 🎯 **개선된 종목 선택 프로세스**: 후보군 표시 → 사용자 선택 → 분석 순서
-- 📱 **세션 유지 시스템**: 모달창을 닫아도 분석 결과 보존
-- 🤖 **후속 interaction 시스템**: 객관식 질문으로 추가 분석 가능
-- 🏷️ **종목명 우선 표시**: 코드 대신 실제 종목명으로 명확한 식별
-- ✨ **애니메이션 효과**: 지니 램프 스타일의 모달 등장 효과
-
-### v1.0.0
-- 기본 플로팅 버튼 및 모달 UI 구현
-- 네이버 금융 API 연동
-- ChatGPT AI 분석 기능 추가
-- OpenAI API 키 관리 시스템 구현
+MIT License
