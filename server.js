@@ -25,28 +25,32 @@ app.post('/api/stock/:ticker', async (req, res) => {
     let stockData = {};
     
     try {
-      // 기본 정보 조회
-      const basicUrl = `https://api.stock.naver.com/stock/${ticker}/basic`;
-      const response = await axios.get(basicUrl, {
+      // 네이버 실시간 API 사용
+      const realtimeUrl = `https://polling.finance.naver.com/api/realtime/domestic/stock/${ticker}`;
+      const response = await axios.get(realtimeUrl, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
       });
       
-      const data = response.data;
+      const data = response.data.datas?.[0];
       
-      stockData = {
-        ohlcv: {
-          close: data.closePrice || 75000,
-          volume: data.accumulatedTradingVolume || 1000000,
-          changePercent: data.fluctuationsRatio || 2.5
-        },
-        marketCap: data.marketValue || 450000000000000,
-        fundamental: {
-          per: data.per || 15.2,
-          pbr: data.pbr || 1.8
-        }
-      };
+      if (data) {
+        stockData = {
+          ohlcv: {
+            close: parseInt(data.closePrice.replace(/,/g, '')),
+            volume: parseInt(data.accumulatedTradingVolume.replace(/,/g, '')),
+            changePercent: parseFloat(data.fluctuationsRatio)
+          },
+          marketCap: 450000000000000, // 시가총액은 별도 계산 필요
+          fundamental: {
+            per: 15.2, // PER은 별도 API 필요
+            pbr: 1.8   // PBR은 별도 API 필요
+          }
+        };
+      } else {
+        throw new Error('No data found');
+      }
     } catch (naverError) {
       console.log('Naver API failed, using mock data');
       // 네이버 API 실패시 더미 데이터
