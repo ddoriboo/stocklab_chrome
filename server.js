@@ -91,7 +91,7 @@ PBR: ${stockData.fundamental?.pbr}
     }
 
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini-search-preview-2025-03-11',
       messages: [
         {
           role: 'system',
@@ -102,7 +102,6 @@ PBR: ${stockData.fundamental?.pbr}
           content: prompt
         }
       ],
-      temperature: 0.7,
       max_tokens: 200
     }, {
       headers: {
