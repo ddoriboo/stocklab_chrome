@@ -10,22 +10,30 @@
   ],
   "host_permissions": [
     "http://localhost:*/*",
-    "https://api.openai.com/*"
+    "https://*.railway.app/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [{
-    "matches": ["<all_urls>"],
+    "matches": [
+      "https://*.naver.com/*",
+      "https://finance.naver.com/*",
+      "https://news.naver.com/*",
+      "https://m.stock.naver.com/*",
+      "http://localhost/*",
+      "https://*.daum.net/*",
+      "https://finance.daum.net/*"
+    ],
     "js": ["content.js"],
-    "css": ["styles.css"]
+    "css": ["styles.css"],
+    "run_at": "document_end"
   }],
   "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icon-16.png",
-      "48": "icon-48.png",
-      "128": "icon-128.png"
-    }
-  }
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": [{
+    "resources": ["floating-icon.gif"],
+    "matches": ["<all_urls>"]
+  }]
 }

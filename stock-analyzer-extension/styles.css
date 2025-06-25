@@ -1,97 +1,542 @@
-/* 주식 키워드 하이라이트 */
-.stock-highlight {
-  background-color: #e3f2fd;
-  color: #1976d2;
-  padding: 2px 4px;
-  border-radius: 3px;
+/* 플로팅 아이콘 */
+.stock-floating-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
   cursor: pointer;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.stock-floating-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.stock-floating-icon img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.floating-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.stock-floating-icon.has-notification .floating-pulse {
+  background: rgba(255, 87, 34, 0.5);
+  animation: notification-pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+
+@keyframes notification-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+/* 넛지 팝업 */
+.stock-nudge-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  z-index: 10001;
+  animation: nudgeSlideIn 0.5s ease-out;
+  max-width: 400px;
+  border: 2px solid #e3f2fd;
+}
+
+@keyframes nudgeSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -80%);
+    scale: 0.8;
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    scale: 1;
+  }
+}
+
+.nudge-content {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  gap: 16px;
+}
+
+.nudge-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.nudge-text {
+  flex: 1;
+}
+
+.nudge-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1565c0;
+  margin-bottom: 4px;
+}
+
+.nudge-subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+.nudge-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.nudge-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
-.stock-highlight:hover {
-  background-color: #bbdefb;
-  color: #0d47a1;
+.nudge-analyze {
+  background: #1976d2;
+  color: white;
 }
 
-/* 분석 팝업 */
-.stock-analysis-popup {
+.nudge-analyze:hover {
+  background: #1565c0;
+  transform: translateY(-1px);
+}
+
+.nudge-close {
+  background: #f5f5f5;
+  color: #666;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.nudge-close:hover {
+  background: #e0e0e0;
+}
+
+/* 분석 모달 */
+.stock-analysis-modal {
   position: fixed;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  max-width: 400px;
-  z-index: 10000;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10002;
+  animation: modalFadeIn 0.3s ease-out;
 }
 
-.popup-header {
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.4s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+    scale: 0.9;
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    scale: 1;
+  }
+}
+
+.modal-content.loading {
+  text-align: center;
+  padding: 40px;
+  max-width: 300px;
+}
+
+.modal-content.error {
+  max-width: 400px;
+}
+
+.modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
-  background-color: #f5f5f5;
-  border-radius: 8px 8px 0 0;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.popup-header h3 {
+.modal-header h3 {
   margin: 0;
-  font-size: 16px;
-  color: #333;
+  font-size: 20px;
+  color: #1565c0;
+  font-weight: 600;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 24px;
+  color: #999;
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #f5f5f5;
   color: #666;
-  padding: 0;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin: 16px 0;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  background: #1976d2;
+  border-radius: 50%;
+  animation: dotBounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* 분석 결과 */
+.analysis-result {
+  padding: 24px;
+}
+
+.stock-info {
+  margin-bottom: 24px;
+}
+
+.stock-price {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.change {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.change.positive {
+  color: #d32f2f;
+  background: #ffebee;
+}
+
+.change.negative {
+  color: #1976d2;
+  background: #e3f2fd;
+}
+
+.stock-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.metric .label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.metric .value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* AI 분석 */
+.ai-analysis {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+  border-radius: 12px;
+  border-left: 4px solid #1976d2;
+}
+
+.ai-analysis h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #1565c0;
+}
+
+.ai-analysis p {
+  margin: 0;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* 후속 질문 버블 */
+.follow-up-questions h4 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.question-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bubble-btn {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.bubble-btn:hover {
+  background: #1976d2;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* 에러 메시지 */
+.error-message {
+  padding: 24px;
+  text-align: center;
+}
+
+.error-message p {
+  color: #d32f2f;
+  margin-bottom: 16px;
+}
+
+.retry-btn {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: #1565c0;
+}
+
+/* 메인 메뉴 */
+.stock-main-menu {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  z-index: 10001;
+  animation: menuSlideUp 0.3s ease-out;
+  min-width: 200px;
+}
+
+@keyframes menuSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-content {
+  padding: 20px;
+  position: relative;
+}
+
+.menu-content h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #1565c0;
+  text-align: center;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-btn {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.menu-btn:hover {
+  background: #e3f2fd;
+  border-color: #bbdefb;
+}
+
+.menu-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #999;
+  cursor: pointer;
   width: 24px;
   height: 24px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.close-btn:hover {
-  color: #333;
+.menu-close:hover {
+  background: #f5f5f5;
 }
 
-.popup-content {
-  padding: 16px;
-}
-
-.stock-data {
-  margin-bottom: 16px;
-}
-
-.stock-data p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.stock-data strong {
-  color: #333;
-  font-weight: 500;
-}
-
-.ai-analysis {
-  border-top: 1px solid #eee;
-  padding-top: 12px;
-}
-
-.ai-analysis h4 {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  color: #1976d2;
-}
-
-.ai-analysis p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #666;
+/* 반응형 */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 90vw;
+    margin: 0 5vw;
+  }
+  
+  .stock-floating-icon {
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+  }
+  
+  .stock-floating-icon img {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .nudge-content {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .question-bubbles {
+    justify-content: center;
+  }
 }

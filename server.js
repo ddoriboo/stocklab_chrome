@@ -67,9 +67,18 @@ app.post('/api/stock/:ticker', async (req, res) => {
 // OpenAI 프록시 (CORS 회피)
 app.post('/api/analyze', async (req, res) => {
   try {
-    const { stockName, stockData, apiKey } = req.body;
+    const { stockName, stockData, apiKey, question } = req.body;
     
-    const prompt = `
+    let prompt;
+    
+    if (question) {
+      // 후속 질문인 경우
+      prompt = `${stockName}에 대한 질문: ${question}
+      
+한국어로 전문적이고 구체적인 답변을 2-3문장으로 제공해주세요.`;
+    } else {
+      // 일반 분석인 경우
+      prompt = `
 다음 주식 데이터를 분석해주세요:
 종목명: ${stockName}
 현재가: ${stockData.ohlcv?.close}원
@@ -79,6 +88,7 @@ PER: ${stockData.fundamental?.per}
 PBR: ${stockData.fundamental?.pbr}
 
 간단한 투자 인사이트를 한국어로 2-3문장으로 제공해주세요.`;
+    }
 
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-3.5-turbo',

@@ -27,18 +27,8 @@ async function checkServerStatus() {
     serverStatus = false;
   }
   
-  // 아이콘 업데이트
-  chrome.action.setIcon({
-    path: serverStatus ? {
-      "16": "icon-16.png",
-      "48": "icon-48.png",
-      "128": "icon-128.png"
-    } : {
-      "16": "icon-16-gray.png",
-      "48": "icon-48-gray.png",
-      "128": "icon-128-gray.png"
-    }
-  });
+  // 아이콘 업데이트 (아이콘 파일이 있을 때만 사용)
+  // chrome.action.setIcon({ ... });
 }
 
 // 주기적으로 서버 상태 확인
@@ -57,6 +47,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.action === 'updateServerUrl') {
     SERVER_URL = request.serverUrl;
     checkServerStatus();
+  } else if (request.action === 'askFollowUp') {
+    askFollowUpQuestion(request.stock, request.question)
+      .then(answer => sendResponse({ answer }))
+      .catch(error => sendResponse({ error: error.message }));
+    return true; // 비동기 응답
   }
 });
 
@@ -141,6 +136,34 @@ async function getAIAnalysis(stockName, stockData) {
   } catch (error) {
     console.error('Analysis error:', error);
     return '분석 중 오류가 발생했습니다.';
+  }
+}
+
+// 후속 질문 처리
+async function askFollowUpQuestion(stockName, question) {
+  try {
+    const response = await fetch(`${SERVER_URL}/api/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        stockName,
+        stockData: {},
+        apiKey: OPENAI_API_KEY,
+        question: question
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Follow-up question failed');
+    }
+    
+    const data = await response.json();
+    return data.analysis;
+  } catch (error) {
+    console.error('Follow-up question error:', error);
+    throw error;
   }
 }
 
