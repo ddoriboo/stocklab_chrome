@@ -49,6 +49,7 @@ class StockAnalyzer {
     `;
     
     this.floatingIcon.addEventListener('click', () => {
+      this.floatingIcon.classList.add('active');
       this.showMainMenu();
     });
     
@@ -373,24 +374,30 @@ class StockAnalyzer {
     menu.querySelector('.scan-btn').addEventListener('click', () => {
       this.detectedStocks.clear();
       this.scanForStocks();
-      menu.remove();
+      this.closeMenu(menu);
     });
     
     menu.querySelector('.settings-btn').addEventListener('click', () => {
       chrome.runtime.sendMessage({ action: 'openSettings' });
-      menu.remove();
+      this.closeMenu(menu);
     });
     
     menu.querySelector('.menu-close').addEventListener('click', () => {
-      menu.remove();
+      this.closeMenu(menu);
     });
     
     // 자동 닫기
     setTimeout(() => {
       if (menu.parentNode) {
-        menu.remove();
+        this.closeMenu(menu);
       }
     }, 10000);
+  }
+
+  // 메뉴 닫기 헬퍼 함수
+  closeMenu(menu) {
+    menu.remove();
+    this.floatingIcon.classList.remove('active');
   }
 }
 

@@ -2,29 +2,40 @@
 .stock-floating-icon {
   position: fixed;
   bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
   cursor: pointer;
   z-index: 10000;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  opacity: 0.7;
 }
 
 .stock-floating-icon:hover {
-  transform: scale(1.1);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  opacity: 1;
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.stock-floating-icon.active {
+  opacity: 1;
+}
+
+.stock-floating-icon.has-notification {
+  opacity: 0.95;
 }
 
 .stock-floating-icon img {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
 }
 
@@ -59,27 +70,27 @@
 /* 넛지 팝업 */
 .stock-nudge-popup {
   position: fixed;
-  top: 50%;
+  bottom: 85px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   z-index: 10001;
-  animation: nudgeSlideIn 0.5s ease-out;
-  max-width: 400px;
-  border: 2px solid #e3f2fd;
+  animation: nudgeSlideUp 0.4s ease-out;
+  max-width: 280px;
+  border: 1px solid #e3f2fd;
 }
 
-@keyframes nudgeSlideIn {
+@keyframes nudgeSlideUp {
   from {
     opacity: 0;
-    transform: translate(-50%, -80%);
-    scale: 0.8;
+    transform: translateX(-50%) translateY(20px);
+    scale: 0.9;
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%) translateY(0);
     scale: 1;
   }
 }
@@ -87,12 +98,12 @@
 .nudge-content {
   display: flex;
   align-items: center;
-  padding: 20px;
-  gap: 16px;
+  padding: 12px 16px;
+  gap: 12px;
 }
 
 .nudge-icon {
-  font-size: 32px;
+  font-size: 20px;
   flex-shrink: 0;
 }
 
@@ -101,14 +112,14 @@
 }
 
 .nudge-title {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   color: #1565c0;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .nudge-subtitle {
-  font-size: 14px;
+  font-size: 12px;
   color: #666;
 }
 
@@ -119,11 +130,11 @@
 }
 
 .nudge-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   transition: all 0.2s ease;
 }
@@ -141,13 +152,14 @@
 .nudge-close {
   background: #f5f5f5;
   color: #666;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  font-size: 14px;
 }
 
 .nudge-close:hover {
@@ -521,19 +533,31 @@
   
   .stock-floating-icon {
     bottom: 15px;
-    right: 15px;
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
   }
   
   .stock-floating-icon img {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
+  }
+  
+  .stock-nudge-popup {
+    bottom: 70px;
+    max-width: 240px;
   }
   
   .nudge-content {
-    padding: 16px;
-    gap: 12px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .nudge-title {
+    font-size: 13px;
+  }
+  
+  .nudge-subtitle {
+    font-size: 11px;
   }
   
   .question-bubbles {
