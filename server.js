@@ -11,9 +11,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// pykrx를 사용한 주식 데이터 가져오기 (Python 스크립트 호출)
-const { execSync } = require('child_process');
-
 // 헬스 체크
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
@@ -24,70 +21,35 @@ app.post('/api/stock/:ticker', async (req, res) => {
   try {
     const { ticker } = req.params;
     
-    // Python 스크립트로 주식 데이터 가져오기
-    const pythonScript = `
-import json
-import sys
-from datetime import datetime, timedelta
-try:
-    from pykrx import stock
+    // 네이버 금융 API 사용 (공개 API)
+    let stockData = {};
     
-    ticker = "${ticker}"
-    today = datetime.now().strftime('%Y%m%d')
-    month_ago = (datetime.now() - timedelta(days=30)).strftime('%Y%m%d')
-    
-    # OHLCV 데이터
-    ohlcv = stock.get_market_ohlcv(month_ago, today, ticker)
-    if not ohlcv.empty:
-        latest = ohlcv.iloc[-1]
-        prev = ohlcv.iloc[-2] if len(ohlcv) > 1 else latest
-        change_pct = ((latest['종가'] - prev['종가']) / prev['종가'] * 100)
-    else:
-        latest = {'종가': 0, '거래량': 0}
-        change_pct = 0
-    
-    # 시가총액
-    market_cap = stock.get_market_cap(today, today, ticker)
-    cap_value = market_cap.iloc[-1]['시가총액'] if not market_cap.empty else 0
-    
-    # 재무 지표
-    fundamental = stock.get_market_fundamental(today, today, ticker)
-    if not fundamental.empty:
-        fund = fundamental.iloc[-1]
-        per = fund.get('PER', 0)
-        pbr = fund.get('PBR', 0)
-    else:
-        per = pbr = 0
-    
-    result = {
-        'ohlcv': {
-            'close': int(latest.get('종가', 0)),
-            'volume': int(latest.get('거래량', 0)),
-            'changePercent': round(change_pct, 2)
-        },
-        'marketCap': int(cap_value),
-        'fundamental': {
-            'per': float(per),
-            'pbr': float(pbr)
-        }
-    }
-    print(json.dumps(result))
-except Exception as e:
-    # pykrx 없거나 오류시 더미 데이터
-    result = {
-        'ohlcv': {'close': 75000, 'volume': 1000000, 'changePercent': 2.5},
-        'marketCap': 450000000000000,
-        'fundamental': {'per': 15.2, 'pbr': 1.8}
-    }
-    print(json.dumps(result))
-`;
-    
-    let stockData;
     try {
-      const output = execSync(`python3 -c "${pythonScript}"`, { encoding: 'utf8' });
-      stockData = JSON.parse(output);
-    } catch (error) {
-      // Python 실행 실패시 더미 데이터
+      // 기본 정보 조회
+      const basicUrl = `https://api.stock.naver.com/stock/${ticker}/basic`;
+      const response = await axios.get(basicUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      const data = response.data;
+      
+      stockData = {
+        ohlcv: {
+          close: data.closePrice || 75000,
+          volume: data.accumulatedTradingVolume || 1000000,
+          changePercent: data.fluctuationsRatio || 2.5
+        },
+        marketCap: data.marketValue || 450000000000000,
+        fundamental: {
+          per: data.per || 15.2,
+          pbr: data.pbr || 1.8
+        }
+      };
+    } catch (naverError) {
+      console.log('Naver API failed, using mock data');
+      // 네이버 API 실패시 더미 데이터
       stockData = {
         ohlcv: { close: 75000, volume: 1000000, changePercent: 2.5 },
         marketCap: 450000000000000,
